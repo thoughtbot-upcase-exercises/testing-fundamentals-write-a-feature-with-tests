@@ -28,4 +28,34 @@ describe PeopleController do
       end
     end
   end
+
+  describe "#update" do
+    context "with valid attributes" do
+      it "redirects to #show" do
+        person = Person.create(first_name: "Eliot")
+        allow(person).to receive(:update).and_return(true)
+        allow(Person).to receive(:find).
+          with(person.to_param).
+          and_return(person)
+
+        patch :update, id: person.id, person: { first_name: "Thomas" }
+
+        expect(response).to redirect_to(person_path(person))
+      end
+    end
+
+    context "with invalid attributes" do
+      it "redirects to #edit" do
+        person = double("person", id: "1")
+        allow(person).to receive(:update).and_return(false)
+        allow(Person).to receive(:find).
+          with(person.id).
+          and_return(person)
+
+        patch :update, id: person.id, person: { first_name: "" }
+
+        expect(response).to render_template(:edit)
+      end
+    end
+  end
 end
